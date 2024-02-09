@@ -1,0 +1,13 @@
+[Unit]
+After=network-online.target local-fs.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/telegrambot
+EnvironmentFile=/etc/default/telegrambot
+#ExecStartPre=
+ExecStart=/opt/telegrambot/telegrambot
+
+[Install]
+WantedBy=multi-user.target
+

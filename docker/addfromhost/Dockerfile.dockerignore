@@ -1,0 +1,9 @@
+# it is important to ignore the large build context to reduce build time
+.git/
+target/debug/
+target/release/.fingerprint/
+target/release/deps/
+target/release/incremental/
+target/release/examples/
+target/release/.cargo-lock
+

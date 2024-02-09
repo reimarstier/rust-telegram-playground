@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "result": {
+    "allowed_updates": [
+      "message",
+      "edited_message",
+      "channel_post",
+      "edited_channel_post",
+      "inline_query",
+      "chosen_inline_result",
+      "callback_query",
+      "shipping_query",
+      "pre_checkout_query",
+      "poll",
+      "poll_answer",
+      "my_chat_member",
+      "chat_member",
+      "chat_join_request"
+    ],
+    "has_custom_certificate": false,
+    "ip_address": "1.2.3.4",
+    "max_connections": 40,
+    "pending_update_count": 0,
+    "url": "https://bot.example.com/bot"
+  }
+}

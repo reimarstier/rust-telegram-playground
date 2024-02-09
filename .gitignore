@@ -1,0 +1,8 @@
+/target
+.env
+.idea
+telegram*.log
+sqlite.db
+db.sqlite
+db.sqlite-shm
+db.sqlite-wal

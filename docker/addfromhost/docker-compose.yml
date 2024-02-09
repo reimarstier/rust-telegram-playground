@@ -1,0 +1,14 @@
+
+services:
+  rust-bot:
+    build:
+      context: "../.."
+      dockerfile: ./docker/addfromhost/Dockerfile
+    container_name: rust-telegrambot
+    ports:
+      - 8080:8080
+    environment:
+      - "TELOXIDE_LOG_DIR=/var/log/telegrambot/"
+    volumes:
+      - ./log/:/var/log/telegrambot/
+      - ../../.env:/.env

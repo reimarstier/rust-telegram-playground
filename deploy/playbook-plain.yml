@@ -1,0 +1,70 @@
+#!/usr/bin/env ansible-playbook
+# Playbook to deploy telegram bot as systemd service
+
+# run from git repository root directory, note the comma after the hostname
+# ./deploy/playbook-plain.yml -i <hostname>,
+---
+- name: Deploy rust app to targets
+  hosts: "all"
+  remote_user: autorfs
+  become: true
+  gather_facts: True
+
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+
+    - name: Build release
+      become: False
+      delegate_to: localhost
+      shell: cargo build --release
+
+    - name: Release binary fact
+      set_fact:
+        release_binary: "{{ lookup('env','PWD') }}/target/release/rust-telegram-alias-bot"
+        bot_home: "/opt/telegrambot/"
+
+    - name: Check if release is present
+      stat:
+        path: "{{ release_binary }}"
+      register: release_binary_check
+      #failed_when: not release_binary_check.stat.exists
+
+    - name: Show stat
+      ansible.builtin.debug:
+        msg="{{ release_binary_check }}"
+
+    - name: Create target directory on remote host
+      file:
+        path: "{{ bot_home }}"
+        mode: 0755
+        state: directory
+
+    - name: Add the user telegrambot
+      ansible.builtin.user:
+        name: telegrambot
+        shell: /bin/nologin
+        create_home: false
+        home: "{{ bot_home }}"
+        system: true
+
+    - name: Upload binary
+      copy:
+        src: "{{ release_binary }}"
+        dest: "{{ bot_home }}/telegrambot"
+        owner: telegrambot
+        group: telegrambot
+        mode: 0755
+
+    - name: Place service template
+      template:
+        src: systemd.service.yml.j2
+        dest: "/etc/systemd/system/telegrambot.service"
+        owner: root
+        group: root
+      register: telegrambot_service_template
+
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
+      when: telegrambot_service_template is changed
