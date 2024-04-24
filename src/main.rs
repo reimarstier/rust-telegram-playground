@@ -1,10 +1,12 @@
-use clap::{ArgAction, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use dotenvy::dotenv;
 
 use crate::bot::admin::AdminCli;
 use crate::bot::core::healthcheck::telegram_healthcheck;
 use crate::bot::core::util;
 use crate::bot::start::bot_start;
+
+shadow_rs::shadow!(build);
 
 mod bot;
 
@@ -21,15 +23,16 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum TaskCli {
-    /// Run telegrambot
-    Bot {
-        #[arg(long, action = ArgAction::SetTrue)]
-        disable_webhook: bool,
-    },
+    /// Run telegram bot with public url in production
+    Bot,
+    /// Run telegram bot without web hook
+    Dev,
     /// Check telegram API for health of this bot
     Healthcheck,
     /// Admin cli
     Admin(AdminCli),
+    /// Version
+    Version,
 }
 
 
@@ -41,18 +44,20 @@ async fn main() -> MyResult {
     util::init_tracing()?;
 
     match args.command {
-        TaskCli::Bot { disable_webhook } => {
-            if disable_webhook {
-                bot_start(false).await?;
-            } else {
-                bot_start(true).await?;
-            }
+        TaskCli::Bot => {
+            bot_start(true).await?;
+        }
+        TaskCli::Dev => {
+            bot_start(false).await?;
         }
         TaskCli::Healthcheck => {
             telegram_healthcheck().await?;
         }
         TaskCli::Admin(implementation) => {
             implementation.default_handling().await?;
+        }
+        TaskCli::Version => {
+            println!("Version: {}", build::VERSION)
         }
     }
 

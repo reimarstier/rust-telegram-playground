@@ -1,3 +1,4 @@
+use std::env;
 use anyhow::anyhow;
 use teloxide::{Bot, dptree};
 use teloxide::dispatching::dialogue::InMemStorage;
@@ -6,7 +7,7 @@ use teloxide::error_handlers::LoggingErrorHandler;
 use teloxide::prelude::Requester;
 use teloxide::update_listeners::webhooks::Options;
 
-use crate::bot::core::bot_config::BotConfig;
+use crate::bot::core::bot_config::{BotConfig, TELOXIDE_BOT_NAME_KEY};
 use crate::bot::core::bot_config::webhook::BotConfigWebHook;
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::connection::MyDatabaseConnection;
@@ -27,13 +28,16 @@ pub(crate) async fn bot_start(use_webhook: bool) -> MyResult {
             return Err(anyhow!("Error getting bot info: {:?}", error));
         }
     }
+    // ensure bot name can be loaded
+    let _bot_name = env::var(TELOXIDE_BOT_NAME_KEY)
+        .map_err(|_error| anyhow!("Bot name must be set in env {}", TELOXIDE_BOT_NAME_KEY))?;
 
     let database_connection = MyDatabaseConnection::new().await?;
     let database_client = DatabaseClient::load(database_connection.clone()).await?;
     let bot_config = BotConfig::new()?;
 
 
-    let dependency_map = dptree::deps![InMemStorage::<State>::new(), database_client, bot_config, database_connection];
+    let dependency_map = dptree::deps![InMemStorage::<State>::new(), database_client, bot_config];
 
     if use_webhook {
         log::info!("Starting bot using webhook listener...");

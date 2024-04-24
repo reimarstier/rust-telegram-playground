@@ -1,12 +1,5 @@
-use std::env;
-use anyhow::anyhow;
-use diesel::{QueryDsl, RunQueryDsl, SelectableHelper};
-use crate::bot::core::bot_config::TELOXIDE_BOT_NAME_KEY;
-
-use crate::bot::core::db::admin::{create_user, register_telegram_account_of_user};
+use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::connection::MyDatabaseConnection;
-use crate::bot::core::db::model::{TelegramAccount, User};
-use crate::bot::core::db::schema::{telegram_accounts, users};
 use crate::MyResult;
 
 /// Manage the bot.
@@ -25,40 +18,46 @@ pub enum TaskCli {
     /// Add telegram user account
     AddTelegram { start_token: String, telegram_id: i64 },
 }
+const PRINT_BARRIER: &str = "----------------------------------------";
+fn print_header(msg: &str, with_newline: bool) {
+    if with_newline {
+        println!();
+    }
+    println!("{}", PRINT_BARRIER);
+    println!("{}", msg);
+    println!("{}", PRINT_BARRIER);
+}
 
 impl AdminCli {
     pub(crate) async fn default_handling(&self) -> MyResult {
-        let database = MyDatabaseConnection::new().await?;
-        let sqlite_con = &mut database.get().await?;
+        let database_connection = MyDatabaseConnection::new().await?;
+        let mut database_client = DatabaseClient::load(database_connection.clone()).await?;
 
         match &self.task {
             TaskCli::Show => {
-                println!("List all users:");
-                let all_users = users::dsl::users
-                    .select(User::as_select())
-                    .load(sqlite_con)
-                    .expect("Error loading users");
+                print_header("List all users:", false);
+                let all_users = database_client.list_users().await?;
                 for user in all_users {
-                    let bot_name = env::var(TELOXIDE_BOT_NAME_KEY)
-                        .map_err(|_error| anyhow!("Bot name must be set in env {}", TELOXIDE_BOT_NAME_KEY))?;
-                    let start_url = format!("https://t.me/{}?start={}", bot_name, user.start);
-                    println!("{}: name={} start={} url={}", user.id, user.name, user.start, start_url);
+                    println!("{}", user);
                 }
 
-                println!("List all telegram accounts:");
-                let telegram_accounts = telegram_accounts::dsl::telegram_accounts
-                    .select(TelegramAccount::as_select())
-                    .load(sqlite_con)
-                    .expect("Error loading accounts");
+                print_header("List all telegram accounts:", true);
+                let telegram_accounts = database_client.list_telegram_accounts().await?;
                 for account in telegram_accounts {
                     println!("id={}: user_id={}", account.id, account.user_id);
                 }
+
+                print_header("List users with telegram account:", true);
+                // let all_users = database_client.list_users_with_telegram_account().await?;
+                // for user in all_users {
+                //     println!("{}", user);
+                // }
             }
             TaskCli::Add { user_name } => {
-                create_user(sqlite_con, user_name)?;
+                database_client.create_user(user_name).await?;
             }
             TaskCli::AddTelegram { start_token, telegram_id } => {
-                let result = register_telegram_account_of_user(sqlite_con, start_token, telegram_id)?;
+                let result = database_client.register_telegram_account_of_user(start_token, *telegram_id).await?;
                 println!("{:?}", result);
             }
         }

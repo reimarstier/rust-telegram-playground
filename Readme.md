@@ -9,7 +9,7 @@
   * Self-hosted deployment options
 * Features:
   * User registration (identify and recognize known users)
-  * Broadcast messages to known users
+  * Broadcast messages to known users (TODO)
 
 
 ## Getting started
