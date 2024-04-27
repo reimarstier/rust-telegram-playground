@@ -1,8 +1,10 @@
+use std::ops::Not;
+use std::process;
 use clap::{Parser, Subcommand};
 use dotenvy::dotenv;
 
 use crate::bot::admin::AdminCli;
-use crate::bot::core::healthcheck::telegram_healthcheck;
+use crate::bot::core::healthcheck::run_healthcheck;
 use crate::bot::core::util;
 use crate::bot::start::bot_start;
 
@@ -41,7 +43,14 @@ async fn main() -> MyResult {
     dotenv().expect(".env file not found!");
 
     let args = Cli::parse();
-    util::init_tracing()?;
+    match args.command {
+        TaskCli::Healthcheck => {
+            // do not enable logging here
+        }
+        _ => {
+            util::init_tracing()?;
+        }
+    }
 
     match args.command {
         TaskCli::Bot => {
@@ -51,7 +60,11 @@ async fn main() -> MyResult {
             bot_start(false).await?;
         }
         TaskCli::Healthcheck => {
-            telegram_healthcheck().await?;
+            let result = run_healthcheck().await;
+            println!("{}", result.to_json());
+            if result.healthy.not() {
+                process::exit(1);
+            }
         }
         TaskCli::Admin(implementation) => {
             implementation.default_handling().await?;

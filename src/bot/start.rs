@@ -1,36 +1,25 @@
-use std::env;
-use anyhow::anyhow;
 use teloxide::{Bot, dptree};
 use teloxide::dispatching::dialogue::InMemStorage;
 use teloxide::dispatching::Dispatcher;
 use teloxide::error_handlers::LoggingErrorHandler;
-use teloxide::prelude::Requester;
+use teloxide::types::Me;
 use teloxide::update_listeners::webhooks::Options;
 
-use crate::bot::core::bot_config::{BotConfig, TELOXIDE_BOT_NAME_KEY};
+use crate::bot::core::bot_config::BotConfig;
 use crate::bot::core::bot_config::webhook::BotConfigWebHook;
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::connection::MyDatabaseConnection;
 use crate::bot::core::dispatch::axum_update_listener;
+use crate::bot::core::healthcheck::bot_identity::ensure_configured_bot_name_is_valid;
 use crate::bot::schema::schema;
 use crate::bot::State;
-use crate::MyResult;
+use crate::{build, MyResult};
 
 pub(crate) async fn bot_start(use_webhook: bool) -> MyResult {
     let bot = Bot::from_env();
-    let result_me = bot.get_me().await;
-    match result_me {
-        Ok(me) => {
-            log::info!("Bot started: {:?}", me);
-        }
-        Err(error) => {
-            log::error!("Error getting bot info: {:?}", error);
-            return Err(anyhow!("Error getting bot info: {:?}", error));
-        }
-    }
-    // ensure bot name can be loaded
-    let _bot_name = env::var(TELOXIDE_BOT_NAME_KEY)
-        .map_err(|_error| anyhow!("Bot name must be set in env {}", TELOXIDE_BOT_NAME_KEY))?;
+    let me = ensure_configured_bot_name_is_valid(&bot).await?;
+    log::info!("Bot started: {:?}", me);
+    print_banner(me);
 
     let database_connection = MyDatabaseConnection::new().await?;
     let database_client = DatabaseClient::load(database_connection.clone()).await?;
@@ -69,4 +58,29 @@ pub(crate) async fn bot_start(use_webhook: bool) -> MyResult {
     }
 
     Ok(())
+}
+
+fn print_banner(me: Me) {
+    let now = chrono::offset::Utc::now();
+    // https://patorjk.com/software/taag/#p=display&f=Big&t=Telegrambot
+    println!(r"
+  _______   _                                _           _
+ |__   __| | |                              | |         | |
+    | | ___| | ___  __ _ _ __ __ _ _ __ ___ | |__   ___ | |_
+    | |/ _ \ |/ _ \/ _` | '__/ _` | '_ ` _ \| '_ \ / _ \| __|
+    | |  __/ |  __/ (_| | | | (_| | | | | | | |_) | (_) | |_
+    |_|\___|_|\___|\__, |_|  \__,_|_| |_| |_|_.__/ \___/ \__|
+                    __/ |
+                   |___/
+
+    Bot name:   {}
+    Bot url:    https://t.me/{}
+    Version:    {}
+    Git Hash:   {}
+    Git Date:   {}
+    Build date: {}
+    Start date: {}
+
+", me.username(), me.username(),
+             build::PKG_VERSION, build::COMMIT_HASH, build::COMMIT_DATE, build::BUILD_TIME, now)
 }

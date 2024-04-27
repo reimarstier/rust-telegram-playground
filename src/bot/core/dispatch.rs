@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use teloxide::prelude::Requester;
 use teloxide::update_listeners::UpdateListener;
 use teloxide::update_listeners::webhooks::{axum_to_router, Options};
-use crate::bot::core::healthcheck::healthcheck;
+use crate::bot::core::healthcheck::endpoint::healthcheck_endpoint;
 
 pub async fn axum_update_listener<R>(
     bot: R,
@@ -16,7 +16,7 @@ pub async fn axum_update_listener<R>(
 
     let (mut update_listener, stop_flag, app) = axum_to_router(bot, options).await?;
     let my_router = axum::Router::new()
-        .route("/healthcheck", axum::routing::get(healthcheck))
+        .route("/healthcheck", axum::routing::get(healthcheck_endpoint))
         .fallback_service(app);
 
     let stop_token = update_listener.stop_token();

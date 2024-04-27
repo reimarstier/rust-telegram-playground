@@ -31,6 +31,8 @@ pub fn init_tracing() -> MyResult {
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_writer(stdout.and(file_appender))
+        // Could be nice to use ansi coloring in stdout but not in file output for persistence, disabling for now
+        .with_ansi(false)
         .compact()
         .init();
 
