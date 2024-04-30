@@ -2,6 +2,7 @@ use teloxide::Bot;
 use teloxide::prelude::{Message, Requester};
 use teloxide::types::Me;
 use teloxide::utils::command::BotCommands;
+use crate::bot::core::db::client::admin_client::DatabaseAdminClient;
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::DatabaseError;
 use crate::bot::HandlerResult;
@@ -28,10 +29,7 @@ pub(crate) async fn register(bot: Bot, msg: Message, mut database_client: Databa
                             DatabaseError::CreateError(_error) => {
                                 bot.send_message(msg.chat.id, "Could not create the user.").await?;
                             }
-                            DatabaseError::Other(_error) => {
-                                bot.send_message(msg.chat.id, "An error occurred.").await?;
-                            }
-                            DatabaseError::Connection(_error) => {
+                            _ => {
                                 bot.send_message(msg.chat.id, "An error occurred.").await?;
                             }
                         }

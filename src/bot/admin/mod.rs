@@ -1,3 +1,4 @@
+use crate::bot::core::db::client::admin_client::DatabaseAdminClient;
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::connection::MyDatabaseConnection;
 use crate::MyResult;
@@ -15,10 +16,14 @@ pub enum TaskCli {
     Show,
     /// Add user
     Add { user_name: String },
-    /// Add telegram user account
+    /// Delete a user
+    Delete { user_name: String },
+    /// Link telegram id to user account
     AddTelegram { start_token: String, telegram_id: i64 },
 }
+
 const PRINT_BARRIER: &str = "----------------------------------------";
+
 fn print_header(msg: &str, with_newline: bool) {
     if with_newline {
         println!();
@@ -46,15 +51,14 @@ impl AdminCli {
                 for account in telegram_accounts {
                     println!("id={}: user_id={}", account.id, account.user_id);
                 }
-
-                print_header("List users with telegram account:", true);
-                // let all_users = database_client.list_users_with_telegram_account().await?;
-                // for user in all_users {
-                //     println!("{}", user);
-                // }
             }
             TaskCli::Add { user_name } => {
-                database_client.create_user(user_name).await?;
+                let user = database_client.create_user(user_name).await?;
+                println!("Created user {}", user);
+            }
+            TaskCli::Delete { user_name } => {
+                let user = database_client.delete_user(user_name).await?;
+                println!("Deleted user {}", user);
             }
             TaskCli::AddTelegram { start_token, telegram_id } => {
                 let result = database_client.register_telegram_account_of_user(start_token, *telegram_id).await?;
