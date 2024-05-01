@@ -3,6 +3,7 @@ CREATE TABLE `users`(
     `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `name` VARCHAR NOT NULL,
     `start` VARCHAR NOT NULL,
+    `role` VARCHAR NOT NULL,
     UNIQUE(name),
     UNIQUE(start)
 );

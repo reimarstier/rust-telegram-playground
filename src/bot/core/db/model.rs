@@ -8,6 +8,7 @@ use crate::bot::core::db::schema::users;
 pub struct NewUser<'a> {
     pub name: &'a str,
     pub start: &'a str,
+    pub role: &'a str,
 }
 
 
@@ -18,6 +19,7 @@ pub struct User {
     pub id: i64,
     pub name: String,
     pub start: String,
+    pub role: String,
 }
 
 #[derive(Insertable)]

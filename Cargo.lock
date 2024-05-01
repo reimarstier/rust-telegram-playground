@@ -480,14 +480,25 @@ dependencies = [
 
 [[package]]
 name = "diesel"
-version = "2.1.4"
+version = "2.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62c6fcf842f17f8c78ecf7c81d75c5ce84436b41ee07e03f490fbb5f5a8731d8"
+checksum = "ff236accb9a5069572099f0b350a92e9560e8e63a9b8d546162f4a5e03026bb2"
 dependencies = [
  "diesel_derives",
  "libsqlite3-sys",
  "r2d2",
  "time",
+]
+
+[[package]]
+name = "diesel-enum"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4b8470493d7120fd53f7d7db6ad167c2bc06fdf8abb3cef7e7669eb1347b415"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1684,6 +1695,7 @@ dependencies = [
  "chrono",
  "clap",
  "diesel",
+ "diesel-enum",
  "diesel_migrations",
  "dotenvy",
  "libsqlite3-sys",

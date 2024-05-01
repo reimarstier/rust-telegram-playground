@@ -2,7 +2,7 @@ use diesel::{QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
 use crate::bot::core::db::DatabaseError;
 use crate::bot::core::db::model::{NewTelegramAccount, NewUser, TelegramAccount, User};
 use crate::bot::core::db::schema::{telegram_accounts, users};
-use crate::bot::core::db::user_representation::UserRepresentation;
+use crate::bot::core::db::user_representation::{UserRepresentation, UserRole};
 use crate::bot::core::util::random_start_token;
 use diesel::ExpressionMethods;
 use diesel::r2d2::ConnectionManager;
@@ -21,7 +21,8 @@ impl DatabaseAdminClient for DatabaseClient {
             .map_err(|error| DatabaseError::Connection(format!("when creating user: {}", error)))?;
 
         let start_token = random_start_token();
-        let new_user = NewUser { name: user_name, start: &start_token };
+        let user = UserRole::User.to_string();
+        let new_user = NewUser { name: user_name, start: &start_token, role: &user };
         diesel::insert_into(users::table)
             .values(&new_user)
             .returning(User::as_returning())

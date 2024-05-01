@@ -1,14 +1,14 @@
 use anyhow::anyhow;
-use diesel::r2d2::ConnectionManager;
 use diesel::{QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
+use diesel::r2d2::ConnectionManager;
 use r2d2::PooledConnection;
+
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::model::{TelegramAccount, User};
 use crate::bot::core::db::schema::{telegram_accounts, users};
 use crate::bot::core::db::user_representation::UserRepresentation;
 
 impl DatabaseClient {
-
     pub(crate) async fn list_users_with_telegram_account(&self, connection: &mut PooledConnection<ConnectionManager<SqliteConnection>>) -> anyhow::Result<Vec<UserRepresentation>> {
         Ok(telegram_accounts::table
             .inner_join(users::table)
@@ -31,6 +31,18 @@ impl DatabaseClient {
             Err(error) => {
                 tracing::error!("Failed to check if user is known: {}. Error: {}", telegram_user_id, error);
                 false
+            }
+        }
+    }
+
+    pub(crate) fn known_admin_user_exists(&self, telegram_user_id: i64) -> bool {
+        let user = self.known_user(telegram_user_id);
+        match user {
+            None => {
+                false
+            }
+            Some(user) => {
+                user.is_admin()
             }
         }
     }

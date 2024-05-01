@@ -12,6 +12,7 @@ diesel::table! {
         id -> BigInt,
         name -> Text,
         start -> Text,
+        role -> Text,
     }
 }
 

@@ -9,8 +9,9 @@ edition = "2021"
 anyhow = "1.0.79"
 axum = "0.6.6"
 clap = { version = "4.5.0", features = ["derive", "wrap_help", "env"] }
-diesel = { version = "2.1.4", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "r2d2"] }
+diesel = { version = "2.1.6", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "r2d2"] }
 diesel_migrations = "2.1.0"
+diesel-enum = "0.2.1"
 dotenvy = "0.15.7"
 libsqlite3-sys = { version = "0.24.2", features = ["bundled"] }
 log = "0.4.20"
