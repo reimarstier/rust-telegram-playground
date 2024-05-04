@@ -4,7 +4,7 @@ use teloxide::prelude::{Message, Requester};
 use crate::bot::{HandlerResult, MyDialogue, State};
 use crate::bot::core::db::client::DatabaseClient;
 
-pub(crate) async fn search(bot: Bot, dialogue: MyDialogue, msg: Message, db_client: DatabaseClient) -> HandlerResult {
+pub(crate) async fn search_start(bot: Bot, dialogue: MyDialogue, msg: Message, db_client: DatabaseClient) -> HandlerResult {
     bot.send_message(msg.chat.id, "Give me a search query.").await?;
     tracing::info!("Initiating search for user id: {:?}", db_client.known_user_exists(msg.chat.id.0));
     dialogue.update(State::Search).await?;

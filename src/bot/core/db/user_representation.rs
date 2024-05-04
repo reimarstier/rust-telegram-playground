@@ -1,5 +1,6 @@
 use std::env;
 use std::fmt::{Display, Formatter};
+use clap::ValueEnum;
 
 use crate::bot::core::bot_config::TELOXIDE_BOT_NAME_KEY;
 use crate::bot::core::db::model::{TelegramAccount, User};
@@ -18,7 +19,7 @@ impl UserRepresentation {
         self.role.eq(&UserRole::Admin)
     }
 }
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, ValueEnum)]
 pub enum UserRole {
     User,
     Admin,

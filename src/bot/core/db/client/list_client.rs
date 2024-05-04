@@ -61,7 +61,10 @@ impl DatabaseClient {
         }
     }
 
-
+    pub async fn list_registered_users(&self) -> anyhow::Result<Vec<UserRepresentation>> {
+        let connection = &mut self.database.get().await?;
+        self.list_users_with_telegram_account(connection).await
+    }
     pub async fn list_users(&self) -> anyhow::Result<Vec<UserRepresentation>> {
         let connection = &mut self.database.get().await?;
 

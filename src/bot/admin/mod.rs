@@ -1,6 +1,7 @@
 use crate::bot::core::db::client::admin_client::DatabaseAdminClient;
 use crate::bot::core::db::client::DatabaseClient;
 use crate::bot::core::db::connection::MyDatabaseConnection;
+use crate::bot::core::db::user_representation::UserRole;
 use crate::MyResult;
 
 /// Manage the bot.
@@ -15,7 +16,7 @@ pub enum TaskCli {
     /// Show database
     Show,
     /// Add user
-    Add { user_name: String },
+    Add { user_name: String, role: UserRole },
     /// Delete a user
     Delete { user_name: String },
     /// Link telegram id to user account
@@ -52,8 +53,8 @@ impl AdminCli {
                     println!("id={}: user_id={}", account.id, account.user_id);
                 }
             }
-            TaskCli::Add { user_name } => {
-                let user = database_client.create_user(user_name).await?;
+            TaskCli::Add { user_name, role } => {
+                let user = database_client.create_user(user_name, role).await?;
                 println!("Created user {}", user);
             }
             TaskCli::Delete { user_name } => {

@@ -10,19 +10,18 @@ use r2d2::PooledConnection;
 use crate::bot::core::db::client::DatabaseClient;
 
 pub trait DatabaseAdminClient {
-    async fn create_user(&self, user_name: &str) -> Result<UserRepresentation, DatabaseError>;
+    async fn create_user(&self, user_name: &str, role: &UserRole) -> Result<UserRepresentation, DatabaseError>;
     async fn delete_user(&self, user_name: &str) -> Result<UserRepresentation, DatabaseError>;
     async fn register_telegram_account_of_user(&mut self, start_token: &str, telegram_id: i64) -> Result<UserRepresentation, DatabaseError>;
 }
 
 impl DatabaseAdminClient for DatabaseClient {
-    async fn create_user(&self, user_name: &str) -> Result<UserRepresentation, DatabaseError> {
+    async fn create_user(&self, user_name: &str, role: &UserRole) -> Result<UserRepresentation, DatabaseError> {
         let connection = &mut self.database.get().await
             .map_err(|error| DatabaseError::Connection(format!("when creating user: {}", error)))?;
 
         let start_token = random_start_token();
-        let user = UserRole::User.to_string();
-        let new_user = NewUser { name: user_name, start: &start_token, role: &user };
+        let new_user = NewUser { name: user_name, start: &start_token, role: &role.to_string() };
         diesel::insert_into(users::table)
             .values(&new_user)
             .returning(User::as_returning())
