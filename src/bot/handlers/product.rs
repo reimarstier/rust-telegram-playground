@@ -4,13 +4,13 @@ use teloxide::prelude::{CallbackQuery, Message, Requester};
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 use crate::bot::{HandlerResult, MyDialogue, State};
 
-pub(crate) async fn start_add_alias(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    bot.send_message(msg.chat.id, "Let's start! Give me an alias to add?").await?;
-    dialogue.update(State::AliasReceive).await?;
+pub(crate) async fn start_purchase(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    bot.send_message(msg.chat.id, "Let's start! What's your full name?").await?;
+    dialogue.update(State::PurchaseReceiveFullName).await?;
     Ok(())
 }
 
-pub(crate) async fn receive_alias(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+pub(crate) async fn receive_full_name(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
     match msg.text().map(ToOwned::to_owned) {
         Some(full_name) => {
             let products = ["Apple", "Banana", "Orange", "Potato"]

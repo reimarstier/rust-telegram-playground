@@ -18,7 +18,7 @@ pub enum State {
     Start,
     Search,
     Broadcast,
-    AliasReceive,
+    PurchaseReceiveFullName,
     ReceiveProductChoice {
         full_name: String,
     },

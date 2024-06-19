@@ -6,7 +6,7 @@ use teloxide::utils::command::BotCommands;
 
 use crate::bot::{HandlerResult, MyDialogue, State};
 use crate::bot::core::db::client::DatabaseClient;
-use crate::bot::handlers::{alias, broadcast, search};
+use crate::bot::handlers::{product, broadcast, search};
 use crate::bot::handlers::register::register;
 
 /// These commands are supported:
@@ -17,15 +17,15 @@ pub(crate) enum BasicCommands {
     Help,
     #[command(description = "Register with this bot")]
     Start(String),
-    #[command(description = "Cancel a dialogue.")]
+    #[command(description = "Cancel a dialogue")]
     Cancel,
 }
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
 enum UserCommands {
-    #[command(description = "Add mail alias.")]
-    Alias,
+    #[command(description = "Purchase product")]
+    Purchase,
     #[command(description = "Search for aliases")]
     Search,
 }
@@ -57,7 +57,7 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
                 })
                 .filter_command::<UserCommands>()
                 .branch(case![UserCommands::Search].endpoint(search::search_start))
-                .branch(case![UserCommands::Alias].endpoint(alias::start_add_alias)),
+                .branch(case![UserCommands::Purchase].endpoint(product::start_purchase)),
             )
         );
 
@@ -81,7 +81,7 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
     let second_stage_handlers = Update::filter_message()
         .branch(case![State::Search].endpoint(search::receive_search_query))
         .branch(case![State::Broadcast].endpoint(broadcast::receive_broadcast_message))
-        .branch(case![State::AliasReceive].endpoint(alias::receive_alias));
+        .branch(case![State::PurchaseReceiveFullName].endpoint(product::receive_full_name));
 
     let message_handler = Update::filter_message()
         .branch(primary_stage_handlers)
@@ -90,7 +90,7 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
         .branch(dptree::endpoint(invalid_state));
 
     let callback_query_handler = Update::filter_callback_query().branch(
-        case![State::ReceiveProductChoice { full_name }].endpoint(alias::receive_product_selection),
+        case![State::ReceiveProductChoice { full_name }].endpoint(product::receive_product_selection),
     );
 
     dialogue::enter::<Update, InMemStorage<State>, State, _>()

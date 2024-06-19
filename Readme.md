@@ -4,13 +4,31 @@
 
 * Learn rust
 * Evaluate rust [teloxide](https://github.com/teloxide/teloxide) crate to write a telegram bot
+* Create an elaborate **example** project
 * Production ready
-  * Health checks
-  * Self-hosted deployment options
+  * Health check endpoint
+  * Self-hosted deployment example
 * Features:
+  * User dialogues, remember state of dialogue
   * User registration (identify and recognize known users)
-  * Broadcast messages to known users (TODO)
-
+  * Differentiate known users into privileged and unprivileged users
+  * Help command `/help`:
+  ```
+  Basic commands:
+  /help — Display this text
+  /start — Register with this bot
+  /cancel — Cancel a dialogue
+  
+  User commands:
+  /purchase — Purchase product
+  /search — Search for aliases
+  
+  Admin commands:
+  /broadcast — Send a message to all registered users.
+  ```
+* Example handlers: 
+  * `/purchase` - Example from [here](https://github.com/teloxide/teloxide/blob/master/crates/teloxide/examples/purchase.rs)
+  * `/broadcast` - Broadcast messages to known users (ADMIN)
 
 ## Getting started
 
