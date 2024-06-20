@@ -5,4 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      # https://embarkstudios.github.io/cargo-deny/index.html
+      # https://github.com/EmbarkStudios/cargo-deny-action
+      # cargo install --locked cargo-deny
+      # cargo deny check --config .ci/cargo-deny-config.toml
       - uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          log-level: warn
+          command: check
+          arguments: --all-features
+          command-arguments: --config .ci/cargo-deny-config.toml
