@@ -30,6 +30,8 @@
   * `/purchase` - Example from [here](https://github.com/teloxide/teloxide/blob/master/crates/teloxide/examples/purchase.rs)
   * `/broadcast` - Broadcast messages to known users (ADMIN)
 
+* CLI to add users
+
 ## Getting started
 
 ### Create telegram bot 
@@ -70,6 +72,28 @@ TELOXIDE_BOT_NAME=mybot
 DATABASE_URL=sqlite://db.sqlite
 ```
 
+### Create a user with the CLI
+
+* Create a user with name and a start token, user_role may be either user or admin.
+```shell
+cargo run -- admin add <username> <user|admin>
+```
+
+```shell
+cargo run -- admin add username admin
+```
+
+You may use the start token to register your telegram account with the bot.
+Just visit the bots telegram address. The url should be printed when creating the user:
+E.g.: `https://t.me/myfantasticbot?start=PPWjtCr1AQ7dHc1wWB5xTS9GsHTr0nSZ`.
+Or find the bot via the search: `@myfantasticbot`.
+Send your start token manually: `/start PPWjtCr1AQ7dHc1wWB5xTS9GsHTr0nSZ`
+
+* Then run bot in development mode
+```shell
+cargo run -- dev
+```
+
 ### Start bot with webhook
 
 There is no TLS configuration within the bot,
@@ -89,6 +113,11 @@ DATABASE_URL=sqlite://db.sqlite
 With the given configuration the bot will register the webhook at `https://mybot.example.com/bot`.
 The actual bot address is under the path `/bot` because there is another path `/healthcheck` added for health checking purposes:
 https://mybot.example.com/healthcheck, see `dispatch.rs` for details.
+
+* Then run 
+```shell
+cargo run -- bot
+```
 
 ### Logging
 
