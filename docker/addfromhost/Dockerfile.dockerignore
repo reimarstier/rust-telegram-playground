@@ -1,6 +1,8 @@
 # it is important to ignore the large build context to reduce build time
 .git/
 target/debug/
+# omitting release directory, so the docker build may find the release binary build from the host system
+# ./target/release/
 target/release/.fingerprint/
 target/release/deps/
 target/release/incremental/

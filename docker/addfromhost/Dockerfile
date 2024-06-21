@@ -4,7 +4,7 @@ FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y libssl3 tzdata ca-certificates
 
-# does not compile the app itself, simply adds the release binary from the host
+# does not compile the app itself, simply adds the release binary from the host, requires compilation on the host
 COPY ./target/release/rust-telegram-alias-bot /rust-telegram-alias-bot
 
 # drop root privileges

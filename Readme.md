@@ -4,10 +4,17 @@
 
 * Learn rust
 * Evaluate rust [teloxide](https://github.com/teloxide/teloxide) crate to write a telegram bot
+  * Examples [here](https://github.com/teloxide/teloxide/tree/master/crates/teloxide/examples)
+  * Teloxide uses [dptree](https://github.com/teloxide/dptree) -
+    its own implementation of the [chain (tree) of responsibility pattern](https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern).
+    This makes writing handlers very easy, but it has some pitfalls.
 * Create an elaborate **example** project
-* Production ready
-  * Health check endpoint
-  * Self-hosted deployment example
+  * Allow to differentiate users (registered users, privileged users aka admins)
+* Production ready (when using telegram bot with webhook)
+  * Moved bot url to own path `/bot` when using webhook to allow additional [endpoints](src/bot/core/dispatch.rs).
+  * Own health check endpoint `/healthcheck`
+  * Check telegram api for bot health (introspection), [here](src/bot/core/healthcheck/tasks/webhook.rs).
+  * Self-hosted deployment [example](docker/build/docker-compose.yml)
 * Features:
   * User dialogues, remember state of dialogue
   * User registration (identify and recognize known users)
@@ -26,11 +33,18 @@
   Admin commands:
   /broadcast — Send a message to all registered users.
   ```
-* Example handlers: 
-  * `/purchase` - Example from [here](https://github.com/teloxide/teloxide/blob/master/crates/teloxide/examples/purchase.rs)
-  * `/broadcast` - Broadcast messages to known users (ADMIN)
+  * Example handlers: 
+    * `/register` [handler](src/bot/handlers/register.rs).
+    * `/purchase` [handler](src/bot/handlers/product.rs). Example from [here](https://github.com/teloxide/teloxide/blob/master/crates/teloxide/examples/purchase.rs).
+    * `/broadcast` [handler](src/bot/handlers/broadcast.rs). Broadcast messages to known users (only ADMIN).
 
-* CLI to add users
+  * CLI 
+    * Add user subcommand `cargo run -- admin`. [admin](src/bot/admin/mod.rs)
+    * Start bot in dev mode: `cargo run -- dev`
+  * SQLite database to store users
+    * Database [schema](src/bot/core/db/schema.rs)
+    * Rust database [model](src/bot/core/db/model.rs)
+  * Logging to file and log rotation, see [logging configuration](src/bot/core/util.rs)
 
 ## Getting started
 
