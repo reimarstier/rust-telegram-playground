@@ -53,7 +53,7 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
             case![State::Start]
                 .branch(
                     dptree::filter(|database_client: DatabaseClient, msg: Message| {
-                    msg.from().map(|user| database_client.known_user_exists(user.id.0 as i64)).unwrap_or(false)
+                    msg.from.map(|user| database_client.known_user_exists(user.id.0 as i64)).unwrap_or(false)
                 })
                 .filter_command::<UserCommands>()
                 .branch(case![UserCommands::Search].endpoint(search::search_start))
@@ -66,7 +66,7 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
             case![State::Start]
                 .branch(
                     dptree::filter(|database_client: DatabaseClient, msg: Message| {
-                        msg.from().map(|user| database_client.known_admin_user_exists(user.id.0 as i64)).unwrap_or(false)
+                        msg.from.map(|user| database_client.known_admin_user_exists(user.id.0 as i64)).unwrap_or(false)
                     })
                         .filter_command::<AdminCommands>()
                         .branch(case![AdminCommands::Broadcast].endpoint(broadcast::broadcast_start)),
