@@ -18,17 +18,22 @@
       become: False
       delegate_to: localhost
       shell: cargo build --release
+      changed_when: False
 
     - name: Release binary fact
+      become: False
+      delegate_to: localhost
       set_fact:
         release_binary: "{{ lookup('env','PWD') }}/target/release/rust-telegram-alias-bot"
         bot_home: "/opt/telegrambot/"
 
     - name: Check if release is present
+      become: False
+      delegate_to: localhost
       stat:
         path: "{{ release_binary }}"
       register: release_binary_check
-      #failed_when: not release_binary_check.stat.exists
+      failed_when: not release_binary_check.stat.exists
 
     - name: Show stat
       ansible.builtin.debug:
@@ -55,6 +60,7 @@
         owner: telegrambot
         group: telegrambot
         mode: 0755
+      register: telegrambot_binary_updated
 
     - name: Place service template
       template:
@@ -68,3 +74,9 @@
       systemd:
         daemon_reload: yes
       when: telegrambot_service_template is changed
+
+    - name: restart service
+      ansible.builtin.service:
+        name: telegrambot
+        state: restarted
+      when: telegrambot_binary_updated is changed
