@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use std::net::SocketAddr;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use crate::bot::core::bot_config::{TELEGRAM_BOT_ENDPOINT_HEALTHCHECK, TELOXIDE_BIND_ADDRESS_KEY, TELOXIDE_BIND_PORT_KEY, TELOXIDE_PUBLIC_URL_KEY};
+use crate::bot::core::bot_config::{TELEGRAM_BOT_ENDPOINT_BOT, TELEGRAM_BOT_ENDPOINT_HEALTHCHECK, TELOXIDE_BIND_ADDRESS_KEY, TELOXIDE_BIND_PORT_KEY, TELOXIDE_PUBLIC_URL_KEY};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub(crate) struct BotConfigWebHook {
@@ -33,7 +33,7 @@ impl BotConfigWebHook {
         let public_url: Url = public_url_string.parse()
             .map_err(|error| anyhow!("Failed to parse public url in environment variable '{}'. Error: {}", TELOXIDE_PUBLIC_URL_KEY, error))?;
 
-        let public_bot_url: Url = public_url.join("/bot")?;
+        let public_bot_url: Url = public_url.join(TELEGRAM_BOT_ENDPOINT_BOT)?;
         let public_healthcheck_url: Url = public_url.join(TELEGRAM_BOT_ENDPOINT_HEALTHCHECK)?;
 
         Ok(Self {

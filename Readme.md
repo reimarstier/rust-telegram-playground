@@ -158,3 +158,10 @@ https://t.me/<TELOXIDE_BOT_NAME>?start=secret
 ### Diesel-rs
 
 https://diesel.rs/guides/all-about-inserts.html#the-returning-clause
+
+### Cargo deny
+
+Cargo plugin for linting your dependencies:
+```shell
+cargo deny check --config .ci/cargo-deny-config.toml
+```

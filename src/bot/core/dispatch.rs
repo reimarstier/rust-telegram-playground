@@ -26,18 +26,16 @@ pub async fn axum_update_listener<R>(
     tokio::spawn(async move {
         let tcp_listener = tokio::net::TcpListener::bind(address)
             .await
-            .map_err(|err| {
+            .inspect_err(|_err| {
                 stop_token.stop();
-                err
             })
             .expect("Couldn't bind to the address");
 
         axum::serve(tcp_listener, my_router)
             .with_graceful_shutdown(stop_flag)
             .await
-            .map_err(|err| {
+            .inspect_err(|_err| {
                 stop_token.stop();
-                err
             })
             .expect("Axum server error");
     });

@@ -100,9 +100,9 @@ pub(crate) fn schema() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync 
 
 
 async fn help(bot: Bot, msg: Message, database_client: DatabaseClient) -> HandlerResult {
-    let basic_commands = format!("Basic commands:\n{}", BasicCommands::descriptions().to_string());
-    let user_commands = format!("User commands:\n{}", UserCommands::descriptions().to_string());
-    let admin_commands = format!("Admin commands:\n{}", AdminCommands::descriptions().to_string());
+    let basic_commands = format!("Basic commands:\n{}", BasicCommands::descriptions());
+    let user_commands = format!("User commands:\n{}", UserCommands::descriptions());
+    let admin_commands = format!("Admin commands:\n{}", AdminCommands::descriptions());
     if database_client.known_admin_user_exists(msg.chat.id.0) {
         let response = format!("{}\n\n{}\n\n{}", basic_commands, user_commands, admin_commands);
         bot.send_message(msg.chat.id, response).await?;

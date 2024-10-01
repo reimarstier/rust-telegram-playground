@@ -10,12 +10,9 @@ impl HealthcheckTask for HealthEndpointCheck {
         let bot_config = BotConfigWebHook::new();
         match bot_config {
             Ok(bot_config) => {
-                let bot_health_reply = reqwest::get(bot_config.public_healthcheck_url)
+                let _bot_health_reply = reqwest::get(bot_config.public_healthcheck_url)
                     .await;
-                match bot_health_reply {
-                    Ok(_) => {}  // TODO
-                    Err(_) => {}
-                }
+                todo!()
             }
             Err(_error) => {
                 // webhook configuration error
